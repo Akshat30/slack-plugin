@@ -1,0 +1,25 @@
+Slack Plugin Description File
+Purpose:
+This plugin is designed to fetch messages from a Slack workspace for a specified number of past days. The user will provide a single integer that represents the number of days to search for messages in Slack. After fetching the messages, the plugin will perform additional tasks as per the user's request, such as summarizing the messages.
+
+Input:
+Number of Days (Integer): A single integer value that represents the number of days in the past for which the user wants to search for messages in Slack.
+Process:
+Receive Input:
+
+The model receives a single integer input from the user, which represents the number of days to search for messages in Slack.
+Example Input: 2
+Send Query to Slack Plugin:
+
+The model sends a query to the Slack plugin with the input integer.
+Example Query: {"query": "2"}
+Fetch Messages from Slack:
+
+The Slack plugin fetches messages from the Slack workspace that were posted in the past X days, where X is the input integer.
+Process Messages as per User Request:
+
+After fetching the messages, the model processes them based on the user’s subsequent request. This could involve summarizing the messages, extracting specific information, etc.
+Output:
+Processed Messages:
+The output will be the processed form of the messages fetched from Slack, based on the user's request.
+Example Output for a Summarization Request

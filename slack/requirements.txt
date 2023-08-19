@@ -1,0 +1,5 @@
+quart
+quart-cors
+slack
+slack-sdk
+aiohttp
