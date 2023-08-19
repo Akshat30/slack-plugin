@@ -1,9 +1,15 @@
 from slack_sdk import WebClient
 from datetime import datetime, timedelta
 import json
+import os
+
+# Slack app initialization
+slack_token = os.environ.get("SLACK_USER_TOKEN")
+if not slack_token:
+    raise ValueError("Please set the SLACK_USER_TOKEN environment variable")
 
 # Initialize the Slack WebClient with your access token
-client = WebClient(token='xoxp-5558065029315-5581886052096-5731940538951-e3d58677f2debbab070b2731cfe50449')
+client = WebClient(token=slack_token)
 
 # Calculate the date range for the last week
 today = datetime.today()
