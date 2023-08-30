@@ -1,17 +1,7 @@
 import json
 import slack_sdk
-import quart
-import quart_cors
-from quart import request
-from datetime import datetime, timedelta
-import io
 import os
 from dotenv import load_dotenv
-
-app = quart_cors.cors(
-    quart.Quart(__name__),
-    allow_origin="https://chat.openai.com"
-)
 
 # Slack app initialization
 load_dotenv()
@@ -20,12 +10,6 @@ if not slack_token:
     raise ValueError("Please set the SLACK_USER_TOKEN environment variable")
 
 slack_app = slack_sdk.web.WebClient(token=slack_token)
-
-
-def read_file_contents(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-    return json.dumps(content)
 
 def process_search(queries):
     # Search Slack messages
@@ -37,63 +21,10 @@ def process_search(queries):
             messages = response["messages"]["matches"]
             results = [msg["text"] for msg in messages]
             list_of_messages.append(messages)
-            return list_of_messages
         else:
             return quart.Response(response="Failed to search Slack.", status=500)
 
-def get_all_messages(days):
-    today = datetime.today()
-    last_week = today - timedelta(days=days)
 
-    # Convert dates to UNIX timestamps
-    start_timestamp = int(last_week.timestamp())
-    end_timestamp = int(today.timestamp())
-
-    # Fetch the list of channels
-    channels_response = slack_app.conversations_list()
-    channels = channels_response['channels']
-
-    # Prepare a dictionary to store messages
-    all_messages = {}
-
-    # Helper function to get username from user ID
-    def get_username(user_id):
-        user_info_response = slack_app.users_info(user=user_id)
-        if user_info_response['ok']:
-            return user_info_response['user']['real_name']
-        return "Unknown User"
-
-    # Loop through each channel to fetch messages
-    for channel in channels:
-        channel_id = channel['id']
-        channel_name = channel['name']
-        
-        messages_response = slack_app.conversations_history(
-            channel=channel_id,
-            oldest=start_timestamp,
-            latest=end_timestamp
-        )
-        
-        messages = messages_response['messages']
-        
-        for message in messages:
-            user_id = message.get('user', '')  # Handle cases where user ID is not available
-            timestamp = message['ts']
-            text = message.get('text', '')
-            
-            username = get_username(user_id)
-            
-            # Add message to the dictionary
-            if channel_id not in all_messages:
-                all_messages[channel_id] = []
-            all_messages[channel_id].append({
-                'user': username,
-                'timestamp': timestamp,
-                'text': text
-            })
-
-    return all_messages
-    
 @app.post("/search")
 async def search():
     # Get the JSON request body
@@ -102,8 +33,7 @@ async def search():
         return quart.Response(response=json.dumps({"error": "Invalid request body. Must contain a 'query' key."}), status=400)
 
     queries = req["query"]
-    
-    print(queries)
+
     results = process_search(queries)
 
     return quart.Response(response=json.dumps({"results": results}), status=200)

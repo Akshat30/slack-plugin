@@ -3,3 +3,4 @@ quart-cors
 slack
 slack-sdk
 aiohttp
+python-dotenv
